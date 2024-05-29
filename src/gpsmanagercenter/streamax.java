@@ -128,7 +128,6 @@ public class streamax implements Runnable {
                 jsonData.forEach(item -> {
                     JsonObject pos = item.getAsJsonObject();
                     String gpstime= pos.get("gpstime").getAsString();
-
                     String terId= pos.get("terid").getAsString();
                     //String altitude = pos.get("altitude").getAsString();
                     String direction = pos.get("direction").getAsString();
@@ -137,8 +136,16 @@ public class streamax implements Runnable {
                     String speed = pos.get("speed").getAsString();
                     String mes = String.format("<< gpstime:%s,terId:%s,gpslat:%s,gpslng:%s,speed:%s"
                             ,gpstime, terId,gpslat,gpslng,speed);
-                    if(!GPS_TIME.equals(gpstime)){
+                    if(GPS_TIME.equals(gpstime)){
                         handleMsg(mes);
+                        HandleMessage(
+                                terId,
+                                Utils.timeConversion(gpstime),
+                                gpslat,
+                                gpslng,
+                                speed,
+                                direction
+                        );
                     } else {
                         handleMsg("SKIP Message!");
                     }
@@ -150,63 +157,50 @@ public class streamax implements Runnable {
         }
     }
 
-    //a message "!2" indicates a request for all online users.
-    /**
-     * This method will send a message "!2" to the server. the server will notice it starts with '!2', and will
-     * know the user is asking to get all currently online users.
-     * This method will be called once 'refresh' button is pressed in GUI.
-     */
-    void requestOnline() {
-        sendMsg("!2");
-    }
+    void HandleMessage(
+            String deviceId,
+            long timestamp,
+            String lat,
+            String lon,
+            String speed,
+            String bearing
 
-    /**
-     * This method will get a String message and sends this string to the server through our 'writer'
-     * Which is our PrintWriter, the OutputStream to the server.
-     * @param msg String, the message to send to the server.
-     */
-    public void sendMsg(String msg) { // does not update GUI, because it sends to the server. the server will update all GUIs accordingly.
-        writer.println(msg);
-    }
+    ){
+        String requestParams = Utils.formatRequest(
+                deviceId,
+                timestamp,
+                lat,
+                lon,
+                speed,
+                bearing
+        );
+        // handleMsg(requestParams);
+        String apiurl = String.format("http://%s:%d", Configs.traccar_host, Configs.traccar_port);
+        //handleMsg("Hello!");
+        final EntityMapper mapper = EntityMapper.newInstance()
+                .registerSerializer(JsonObject.class, GsonMapper.serializer(JsonObject.class, GSON))
+                .registerDeserializer(JsonObject.class, GsonMapper.deserializer(JsonObject.class, GSON));
 
-    /**
-     * This method will close the inputStream and outputStream and then the socket itself.
-     * it will also update the GUI "disconnect" button to "Connect".
-     */
+        HttpClient client = HttpClient.newBuilder()
+                .withBaseURL(apiurl)
+                .withEntityMapper(mapper)
+                .withDecorator(request -> request.withHeader(HEADER_KEY, HEADER_VALUE))
+                .build();
+
+        HttpResponse res = client.post(requestParams).execute();
+        String mes = String.format(">> gpstime:%s,terId:%s,gpslat:%s,gpslng:%s,speed:%s"
+                ,timestamp, deviceId,lat,lon,speed);
+        if (res.getStatusCode() == 200) {
+            handleMsg(mes);
+        }
+        //handleMsg(response.getResponseEntity(String.class));
+    }
     void closeConnection() {
         keepGoing=false;
         if(streamaxGUI !=null) /** updates GUI 'disconnect' button to 'Connect' because we are disconnected now. */
             streamaxGUI.getConnectBtn().setText("Connect");
     }
-    /******* Private *******/
 
-    /**
-     * This method will get a String username (taken from the GUI corresponding username text area) and sends
-     * a message to the server "!4USERNAME". the server will notice it starts with '!4', and will know the user is
-     * asking to set his name.
-     * This method will be called once connection is made, and only once.
-     * @param username String, the username we are asking the server to set for us.
-     */
-    private void requestUsername(String username) {
-        sendMsg("!4"+username);
-    }
-
-    /**
-     * This method will handle the messages received from the server.
-     * This method will be called from another Thread which listens to the server messages.
-     * This method will notice what the server meant (is it an event or just a message to show on chat, etc).
-     * The logic is as follows; the server sent:
-     * starts with '!2' indicates the server sends us the online users, in the form of !2name1,name2,name3, etc.
-     * starts with '!3' indicates the server is telling us he is shutting down. (so we can close all buffers and threads properly)
-     * starts with '!9' indicates the server is telling us to pick a different username.
-     * starts with Non-Of-The-Above, the server sending us a regular message to show on Chat on ClientGUI.
-     *
-     * @param line String, represents message from the server, with certain logic:
-     * starts with '!2' indicates the server sends us the online users, in the form of !2name1,name2,name3, etc.
-     * starts with '!3' indicates the server is telling us he is shutting down. (so we can close all buffers and threads properly)
-     * starts with '!9' indicates the server is telling us to pick a different username.
-     * starts with Non-Of-The-Above, the server sending us a regular message to show on Chat on ClientGUI.
-     */
     private void handleMsg(String line) {
         if (line.startsWith("!2")) { //all online users
             line = line.substring(2);

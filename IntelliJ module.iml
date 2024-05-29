@@ -21,5 +21,6 @@
     </orderEntry>
     <orderEntry type="library" name="google.code.gson" level="project" />
     <orderEntry type="library" name="realityforge.jetbrains.annotations" level="project" />
+    <orderEntry type="library" name="guicedee.services.jakarta.ws.rs.api" level="project" />
   </component>
 </module>

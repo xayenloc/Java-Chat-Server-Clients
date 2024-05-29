@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="guicedee.services.jakarta.ws.rs.api" type="repository">
+    <properties maven-id="com.guicedee.services:jakarta.ws.rs-api:1.2.2.1" />
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/com/guicedee/services/jakarta.ws.rs-api/1.2.2.1/jakarta.ws.rs-api-1.2.2.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/guicedee/services/jakarta.xml.bind-api/1.2.2.1/jakarta.xml.bind-api-1.2.2.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/guicedee/services/jakarta.activation/1.2.2.1/jakarta.activation-1.2.2.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/guicedee/services/jakarta.validation-api/1.2.2.1/jakarta.validation-api-1.2.2.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/codehaus/woodstox/stax2-api/4.2.1/stax2-api-4.2.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/org/jvnet/staxex/stax-ex/2.1.0-M1/stax-ex-2.1.0-M1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/guicedee/services/jakarta.xml.soap-api/1.2.2.1/jakarta.xml.soap-api-1.2.2.1.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/guicedee/services/jakarta.jws-api/1.2.2.1/jakarta.jws-api-1.2.2.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

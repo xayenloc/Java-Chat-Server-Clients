@@ -129,9 +129,6 @@ public class StreamaxGUI {
 
     /******* Private *********/
 
-    private void sendMsg(String msg) {
-        streamax.sendMsg(msg);
-    }
 
 
     private static JFrame frame;
