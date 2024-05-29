@@ -1,5 +1,5 @@
 # Networks-Ex4
-An amazing chat app using Java including a Server backend and a Client frontend, a GUI and support for multiple users online. 
+An amazing gpsmanagercenter app using Java including a Server backend and a Client frontend, a GUI and support for multiple users online. 
 Supports private messaging between clients.
 
 <b>Client side GUI:</b>
@@ -30,7 +30,7 @@ Server supports tens or hundreds of users online at the same time, all depending
 Server can see private messages between users.<br>
 Server informs of user connecting/disconnecting.<br>
 Server informs of user trying/failure to connect (username already in use, socket connection failure etc.). <br>
-Server has "Server Events" window with a GUI to inform Server Admin with all critical information happening in the server or chat room.<br>
+Server has "Server Events" window with a GUI to inform Server Admin with all critical information happening in the server or gpsmanagercenter room.<br>
 
 #### This project is a Computer Networks Course assignment number 4 at Ariel University.
 

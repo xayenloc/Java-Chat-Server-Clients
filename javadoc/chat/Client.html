@@ -115,7 +115,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <!-- ======== START OF CLASS DATA ======== -->
 <main role="main">
 <div class="header">
-<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">chat</a></div>
+<div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">gpsmanagercenter</a></div>
 <h2 title="Class Client" class="title">Class Client</h2>
 </div>
 <div class="contentContainer">
@@ -123,7 +123,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <li>java.lang.Object</li>
 <li>
 <ul class="inheritance">
-<li>chat.Client</li>
+<li>gpsmanagercenter.streamax</li>
 </ul>
 </li>
 </ul>
@@ -138,7 +138,7 @@ $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
 <pre>public class <span class="typeNameLabel">Client</span>
 extends java.lang.Object
 implements java.lang.Runnable</pre>
-<div class="block">This class represents the Client side of our chat application.
+<div class="block">This class represents the Client side of our gpsmanagercenter application.
  a Client object will run as a Thread hence this class will implement Runnable.
  The client will initiate itself with the ClientGUI, the IP address and port to connect to, and a unique username.
  The client will initiate a connect to a server on given IP address and PORT. (valid ports 1024-65553), and as soon as a connection is made-
@@ -174,7 +174,7 @@ implements java.lang.Runnable</pre>
 <tr class="altColor">
 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a href="#%3Cinit%3E(java.net.InetAddress,int,chat.ClientGUI,java.lang.String,java.util.concurrent.BlockingQueue)">Client</a></span>&#8203;(java.net.InetAddress&nbsp;host,
       int&nbsp;port,
-      <a href="ClientGUI.html" title="class in chat">ClientGUI</a>&nbsp;gui,
+      <a href="ClientGUI.html" title="class in gpsmanagercenter">ClientGUI</a>&nbsp;gui,
       java.lang.String&nbsp;username,
       java.util.concurrent.BlockingQueue&lt;java.lang.String&gt;&nbsp;queue)</code></th>
 <td class="colLast">
@@ -253,7 +253,7 @@ implements java.lang.Runnable</pre>
 <h4>Client</h4>
 <pre>public&nbsp;Client&#8203;(java.net.InetAddress&nbsp;host,
               int&nbsp;port,
-              <a href="ClientGUI.html" title="class in chat">ClientGUI</a>&nbsp;gui,
+              <a href="ClientGUI.html" title="class in gpsmanagercenter">ClientGUI</a>&nbsp;gui,
               java.lang.String&nbsp;username,
               java.util.concurrent.BlockingQueue&lt;java.lang.String&gt;&nbsp;queue)</pre>
 <div class="block">A constructor for the Client object, will update the port, host IP, GUI, and username.</div>
@@ -262,7 +262,7 @@ implements java.lang.Runnable</pre>
 <dd><code>host</code> - InetAddress, the IP address of the host server to connect to.</dd>
 <dd><code>port</code> - Integer, the port of the host server to connect to.</dd>
 <dd><code>gui</code> - ClientGUI, our GUI for the client side.</dd>
-<dd><code>username</code> - String, our username we to the chat with.</dd>
+<dd><code>username</code> - String, our username we to the gpsmanagercenter with.</dd>
 <dd><code>queue</code> - BlockingQueue, used by JUnit for testing all functions using concurrency threads sharing data.</dd>
 </dl>
 </li>

@@ -1,4 +1,11 @@
-package chat;
+package gpsmanagercenter;
+
+import com.google.gson.*;
+import http4j.HttpClient;
+import http4j.EntityMapper;
+
+import http4j.HttpResponse;
+import http4j.external.GsonMapper;
 
 import javax.swing.*;
 import java.io.BufferedReader;
@@ -7,8 +14,16 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  This class represents the Client side of our chat application.
@@ -28,7 +43,16 @@ import java.util.concurrent.BlockingQueue;
  *
  * @author Liad Cohen, Timor Sharabi.
  */
-public class Client implements Runnable {
+public class streamax implements Runnable {
+    private static final int PORT = 1080;
+    private static final Gson GSON = new GsonBuilder().create();
+    private static final String BASE_PATH = String.format("http://localhost:%d", PORT);
+    private static final String BASE_BODY = "Unicorns are real!";
+    private static final String BASE_HEADER_KEY = "X-Test-Header";
+    private static final String BASE_HEADER_VALUE = "yay";
+    private static final String HEADER_KEY = "content-type";
+    private static final String HEADER_VALUE = "application/json";
+    private static final String ECHO_CONTENT = UUID.randomUUID().toString();
 
     /**
      *
@@ -39,11 +63,12 @@ public class Client implements Runnable {
      * @param username String, our username we to the chat with.
      * @param queue BlockingQueue, used by JUnit for testing all functions using concurrency threads sharing data.
      */
-    public Client(InetAddress host, int port, ClientGUI gui, String username,BlockingQueue<String> queue) {
-        this.ip = host;
+    public streamax(String host, int port, StreamaxGUI gui, String username, String password, BlockingQueue<String> queue) {
+        this.host = host;
         this.port = port;
-        this.clientGUI = gui;
+        this.streamaxGUI = gui;
         this.username = username;
+        this.password= password;
         this.queue = queue;
     }
 
@@ -57,66 +82,88 @@ public class Client implements Runnable {
      */
     @Override
     public void run() {
-        try { //trying to connect
-            socket = new Socket(this.ip, this.port);
-        } catch (IOException e) { //some error connecting, cannot even establish connection with socket.
-            if(clientGUI!=null) { /** if we have a GUI, show message on GUI. otherwise, throws exception, so JUnit tests can catch them*/
-                clientGUI.addMsg("Cannot connect to server: connection refused. \nPlease check your input. " +
-                        "The server might also be offline." ); //connection refused.
-                clientGUI.getConnectBtn().setText("Connect");
-            } else { /**No GUI, we put into the BlockingQueue so JUnit can decide what happens. */
-                try {
-                    Thread.sleep(10);
-                    queue.put("ERR: Cannot connect to server: connection refused. \nPlease check your input. " +
-                            "The server might also be offline.");
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }
-            return; /**kill current thread.*/
+    String apiurl = String.format("http://%s:%d", host,port);
+    String apipath = String.format("/api/v1/basic/key?username=%s&password=%s", username,password);
+        handleMsg("Hello!");
+        final EntityMapper mapper = EntityMapper.newInstance()
+                .registerSerializer(JsonObject.class, GsonMapper.serializer(JsonObject.class, GSON))
+                .registerDeserializer(JsonObject.class, GsonMapper.deserializer(JsonObject.class, GSON));
+
+               HttpClient client = HttpClient.newBuilder()
+                .withBaseURL(apiurl)
+                .withEntityMapper(mapper)
+                .withDecorator(request -> request.withHeader(HEADER_KEY, HEADER_VALUE))
+                .build();
+
+        final HttpResponse response = client.get(apipath).execute();
+        if(response.getStatusCode() == 200)
+        {
+            String resBody = response.getResponseEntity(String.class);
+            JsonObject jsonObject = JsonParser.parseString(resBody).getAsJsonObject();
+            JsonObject data = jsonObject.getAsJsonObject("data");
+            String key = data.get("key").getAsString();
+            handleMsg(key);
+
+            Params params = new Params();
+            params.setKey(key);
+            List<String> terIds= new ArrayList<>();
+            terIds.add("0032000F9B");
+            params.setTerid(terIds);
+            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+            String inputPrams = gson.toJson(params);
+            handleMsg(inputPrams);
+            String apigetLast ="/api/v1/basic/gps/last";
+            final HttpResponse response2 = client.post(apigetLast).withInput(()->inputPrams).execute();
+            handleMsg(String.format("%d",response2.getStatusCode()));
+            String resBody2 = response2.getResponseEntity(String.class);
+            handleMsg(resBody2);
+
+
+
+
         }
-        try { /**trying to create i/o streams.*/
-            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            this.writer = new PrintWriter(socket.getOutputStream(), true);
-        } catch (IOException e1) {
-            if(clientGUI != null){
-            clientGUI.addMsg("Cannot create input/output streams (reader/writer)");}
-            else{
-                try {
-                    queue.put("ERR:Cannot create input/output streams (reader/writer)");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            return; //kill current thread.
-        }
-        //we can now listen to the server, on another thread (so we don't block this thread!).
-        Runnable listeningToServer = () -> {
-            String line;
-            while (keepGoing) {
-                try {
-                    line = reader.readLine();
-                    if (line != null) {
-                        handleMsg(line);
-                    }
-                } catch (IOException ioException) { //This means the connection is now closed, probably by the server, but maybe by "Disconnect" button from client.
-                    if (clientGUI!=null) {
-                        clientGUI.addMsg("You are disconnected.");
-                    } else{
-                        try {
-                            queue.put("ERR: You are disconnected.");
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
-                }
-            }
-        };
-        Thread listenServerThread = new Thread(listeningToServer);
-        listenServerThread.start();
-        //after connection made, listening to server, we can request new username for ourselves.
-        requestUsername(this.username);
+
+
+
+
+        //mapper.getDeserializer(JsonObject.class,getKey.class);
+
+       // getKey key= gson.toJson(response.getResponseEntity(JsonObject.class));
+      //  getKey key=null;
+         //       key  = response.getResponseEntity(getKey.class);
+
+       // handleMsg(key.getData());
+       // handleMsg(mapper.getDeserializer(JsonObject.class,test.class));
+        //assertNotNull(response);
+        //assertEquals("OK", response.getStatus());
+        //assertEquals(200, response.getStatusCode());
+        //assertEquals(BASE_BODY, response.getResponseEntity(String.class));
+        //handleMsg(mapper.g);
+
+
+//                 client.get("apipath")
+//                .onStatus(200, response -> {
+//                    handleMsg("Everything is fine");
+//                    handleMsg("Response: " + response.getResponseEntity(String.class));
+//                })
+//                .onStatus(404, response -> handleMsg("Could not find the resource =("))
+//                .onRemaining(response -> handleMsg(String.format( "Got status code: %d\n", response.getStatusCode())))
+//                .onException(Throwable::printStackTrace)
+//
+//                .execute();
+
+
+//        //we can now listen to the server, on another thread (so we don't block this thread!).
+//        Runnable listeningToServer = () -> {
+//            String line;
+//            while (keepGoing) {
+//
+//            }
+//        };
+//        Thread listenServerThread = new Thread(listeningToServer);
+//        listenServerThread.start();
+//        //after connection made, listening to server, we can request new username for ourselves.
+//        //requestUsername(this.username);
     }
 
     //a message "!2" indicates a request for all online users.
@@ -143,53 +190,8 @@ public class Client implements Runnable {
      * it will also update the GUI "disconnect" button to "Connect".
      */
     void closeConnection() {
-        try {
-            if (writer != null) {
-                writer.close();
-            }
-        } catch (Exception e) {
-            if(clientGUI!=null)
-                clientGUI.addMsg("Error with closing current outputStream -> writer");
-            else {
-                try {
-                    queue.put("ERR: Error with closing current outputStream -> writer");
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        try {
-            if (reader != null) {
-                reader.close();
-            }
-        } catch (Exception e) {
-            if (clientGUI!=null) {
-                clientGUI.addMsg("Error with closing current inputStream -> reader");
-            } else {
-                try {
-                    queue.put("ERR: Error with closing current inputStream -> reader");
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        try {
-            if (socket != null) {
-                socket.close();
-            }
-        } catch (Exception e) {
-            if (clientGUI!=null) {
-                clientGUI.addMsg("Error with closing socket!");
-            } else {
-                try {
-                    queue.put("ERR: Error with closing socket!");
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-            }
-        }
-        if(clientGUI!=null) /** updates GUI 'disconnect' button to 'Connect' because we are disconnected now. */
-            clientGUI.getConnectBtn().setText("Connect");
+        if(streamaxGUI !=null) /** updates GUI 'disconnect' button to 'Connect' because we are disconnected now. */
+            streamaxGUI.getConnectBtn().setText("Connect");
     }
     /******* Private *******/
 
@@ -226,8 +228,8 @@ public class Client implements Runnable {
             String[] onlines = line.split(",");
             DefaultListModel model = new DefaultListModel();
             model.addAll(Arrays.asList(onlines));
-            if (clientGUI !=null) {
-                clientGUI.setListModel(model);
+            if (streamaxGUI !=null) {
+                streamaxGUI.setListModel(model);
             } else {
                 try {
                     queue.put(line);
@@ -238,8 +240,8 @@ public class Client implements Runnable {
         } else if (line.startsWith("!3")) {//server telling us he is shutting down.
             closeConnection();
             keepGoing = false;
-            if (clientGUI!=null) {
-                clientGUI.addMsg("Server is shutting down, you are disconnected.");
+            if (streamaxGUI !=null) {
+                streamaxGUI.addMsg("Server is shutting down, you are disconnected.");
             } else {
                 try {
                     queue.put("Server is shutting down, you are disconnected.");
@@ -249,8 +251,8 @@ public class Client implements Runnable {
             }
         }else if(line.startsWith("!9")){ //server telling us to pick different username.
             closeConnection();
-            if (clientGUI !=null) {
-                clientGUI.addMsg(line.substring(2));
+            if (streamaxGUI !=null) {
+                streamaxGUI.addMsg(line.substring(2));
             } else {
                 try {
                     queue.put(line.substring(2));
@@ -259,8 +261,8 @@ public class Client implements Runnable {
                 }
             }
         }else{ //server sending us regular message from broadcast.
-            if (clientGUI!=null) {
-                clientGUI.addMsg(line);
+            if (streamaxGUI !=null) {
+                streamaxGUI.addMsg(line);
             } else {
                 try {
                     queue.put(line);
@@ -280,12 +282,39 @@ public class Client implements Runnable {
     }
 
     private String username;
+    private String password;
     private boolean keepGoing = true;
-    private ClientGUI clientGUI;
+    private StreamaxGUI streamaxGUI;
     private int port;
-    private InetAddress ip;
+    private String host;
     private Socket socket;
     private BufferedReader reader;
     private PrintWriter writer;
     private BlockingQueue<String> queue;
 }
+class Params{
+    private  String key;
+    private  List<String> terid;
+
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public void setTerid(List<String> terid) {
+            this.terid = terid;
+        }
+
+        public List<String> getTerid() {
+            return terid;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s%s", key,terid);
+
+        }
+    }
