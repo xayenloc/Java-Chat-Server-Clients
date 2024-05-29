@@ -4,8 +4,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 
 /**
  * This class represents the GUI of the client.
@@ -79,7 +77,10 @@ public class StreamaxGUI {
         }); /** end actionListener for connect/disconnect button. */
 
 
+        btAddDevice.addActionListener(e -> {
+            new Devices();
 
+        });
 
 
     }
@@ -144,6 +145,7 @@ public class StreamaxGUI {
     private JPanel mainPanel;
     private JTextField textAccount;
     private JTextField textPassword;
+    private JButton btAddDevice;
     private JTextField msgField;
     private JList<String>  connectedUsers;
 
