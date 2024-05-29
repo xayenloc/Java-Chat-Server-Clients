@@ -107,9 +107,10 @@ public class streamax implements Runnable {
 
         Params params = new Params();
         params.setKey(API_KEY);
-        List<String> terIds = new ArrayList<>();
-        terIds.add("0032000F9B");
-        params.setTerid(terIds);
+        //List<String> terIds = new ArrayList<>();
+        //terIds.add(Utils.getDevies());
+        params.setTerid(Utils.getDevies());
+        //handleMsg(Utils.getDevies().toString());
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         String inputPrams = gson.toJson(params);
         //handleMsg(inputPrams);

@@ -27,8 +27,8 @@ public class StreamaxGUI {
             @Override
             public void windowClosing(WindowEvent we)
             {
-                String ObjButtons[] = {"Yes","No"};
-                int PromptResult = JOptionPane.showOptionDialog(null,"Are you sure you want to exit? Liad & Timor will miss you.","Leaving Ex4 Amazing Chat?",JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null,ObjButtons,ObjButtons[1]);
+                String ObjButtons[] = {"Thoát","Không"};
+                int PromptResult = JOptionPane.showOptionDialog(null,"Thoát chương trình có thể mất tín hiệu GPS.","Bạn thực sự muốn thoát không?",JOptionPane.DEFAULT_OPTION,JOptionPane.WARNING_MESSAGE,null,ObjButtons,ObjButtons[1]);
                 if(PromptResult==JOptionPane.YES_OPTION)
                 {
                     if (connectButton.getText().equals("Disconnect")) { //this indicates the client is connected at this moment.
@@ -77,11 +77,6 @@ public class StreamaxGUI {
         }); /** end actionListener for connect/disconnect button. */
 
 
-        btAddDevice.addActionListener(e -> {
-            new Devices();
-
-        });
-
 
     }
 
@@ -90,7 +85,10 @@ public class StreamaxGUI {
      * @param msg String, the message to add to the chat Area.
      */
     void addMsg(String msg) {
-        chatArea.append(msg + "\n");
+        String html= msg + "\n";
+        chatArea.append(html);
+        chatArea.setCaretPosition(chatArea.getDocument().getLength());
+
     }
 
     /**
@@ -103,8 +101,9 @@ public class StreamaxGUI {
         frame.setContentPane(new StreamaxGUI().mainPanel); //set the pane for the frame as our JPanel from our form.
         frame.pack(); //causes the window to be sized to fit the preferred size and layouts of its sub-components.
         frame.setVisible(true); //showing the frame to the screen.
-        frame.setMinimumSize(new Dimension(630,420));
-        frame.setSize(640,440);
+        frame.setMinimumSize(new Dimension(830,620));
+        frame.setSize(840,640);
+        frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); //the default close for the frame, do nothing, because we will prompt a confirmation message. (in constructor).
         frame.setIconImage( new ImageIcon("./img/clientIcon.png").getImage()); // Set our icon to Client gui.
         new StreamaxGUI(); //calls constructor.

@@ -1,7 +1,10 @@
 package gpsmanagercenter;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
  public class Utils {
@@ -39,5 +42,25 @@ import java.util.TimeZone;
              e.printStackTrace();
          }
          return unixTime;
+     }
+     static public List<String> getDevies(){
+         String sqlSelectAllPersons = "SELECT uniqueid FROM oncomgpsv2.tc_devices where model='streamax';";
+         String connectionUrl = "jdbc:mysql://localhost:3306/oncomgpsv2?serverTimezone=UTC";
+         List<String> respone= new ArrayList<>();
+         try (Connection conn = DriverManager.getConnection(connectionUrl, "root", "a235235A@#");
+              PreparedStatement ps = conn.prepareStatement(sqlSelectAllPersons);
+              ResultSet rs = ps.executeQuery()) {
+
+             while (rs.next()) {
+                 String uniqueid = rs.getString("uniqueid");
+                 respone.add(uniqueid);
+                 // do something with the extracted data...
+             }
+         } catch (SQLException e) {
+             // handle the exception
+
+         }
+
+         return respone;
      }
 }
