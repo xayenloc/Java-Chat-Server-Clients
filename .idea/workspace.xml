@@ -5,53 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b4866745-c4b4-45fe-ba69-9a748b8eb5a1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/google_code_gson.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/realityforge_jetbrains_annotations.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/gpsmanagercenter/StreamaxGUI.form" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/ClientSettings.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/ContentType.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/EntityMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/Headers.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/HttpClient.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/HttpMethod.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/HttpRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/HttpResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/external/GsonMapper.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/external/package-info.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/http4j/package-info.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IntelliJ module.iml" beforeDir="false" afterPath="$PROJECT_DIR$/IntelliJ module.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ServerClientJARS/Client.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ServerClientJARS/Server.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classDiagram/updatedClassDiagram.uml" beforeDir="false" afterPath="$PROJECT_DIR$/classDiagram/updatedClassDiagram.uml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/allclasses-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/allclasses-index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/allclasses.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/allclasses.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/allpackages-index.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/allpackages-index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/chat/Client.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/chat/Client.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/chat/ClientGUI.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/chat/ClientGUI.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/chat/ConnectionThread.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/chat/ConnectionThread.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/chat/Server.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/chat/Server.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/chat/ServerGUI.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/chat/ServerGUI.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/chat/package-summary.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/chat/package-summary.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/chat/package-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/chat/package-tree.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/element-list" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/element-list" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/index-files/index-1.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/index-files/index-1.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/index-files/index-2.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/index-files/index-2.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/index-files/index-3.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/index-files/index-3.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/index-files/index-4.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/index-files/index-4.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/index-files/index-5.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/index-files/index-5.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/javadoc/overview-tree.html" beforeDir="false" afterPath="$PROJECT_DIR$/javadoc/overview-tree.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chat/Client.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gpsmanagercenter/streamax.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chat/ClientGUI.form" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chat/ClientGUI.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gpsmanagercenter/StreamaxGUI.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chat/ConnectionThread.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gpsmanagercenter/ConnectionThread.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chat/Server.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chat/ServerGUI.form" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/chat/ServerGUI.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/junitTests/ClientServTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/תרגיל רביעי.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/out/production/IntelliJ module/gpsmanagercenter/streamax.class" beforeDir="false" afterPath="$PROJECT_DIR$/out/production/IntelliJ module/gpsmanagercenter/streamax.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/gpsmanagercenter/streamax.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/gpsmanagercenter/streamax.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -123,12 +79,7 @@
         </breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/gpsmanagercenter/streamax.java</url>
-          <line>143</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/gpsmanagercenter/streamax.java</url>
-          <line>97</line>
+          <line>71</line>
           <option name="timeStamp" value="6" />
         </line-breakpoint>
       </breakpoints>

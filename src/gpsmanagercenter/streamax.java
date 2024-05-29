@@ -9,8 +9,6 @@ import http4j.external.GsonMapper;
 
 import javax.swing.*;
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -21,38 +19,14 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-/**
- This class represents the Client side of our chat application.
- * a Client object will run as a Thread hence this class will implement Runnable.
- * The client will initiate itself with the ClientGUI, the IP address and port to connect to, and a unique username.
- * The client will initiate a connect to a server on given IP address and PORT. (valid ports 1024-65553), and as soon as a connection is made-
- * The client will initiate a thread which will listen for messages from the server.
- * The client itself will have the option to send messages to the server. (Until disconnection happens or the Disconnect button pressed).
- * The client will have the following functions: run(), requestUsername, requestOnline, sendMsg, closeConnection.
- * The client-server communication will happen between the Client (this) class and the ClientConnection which will manage
- * the input/output between the client/server.
- * The Client will store the following: the Port to connect to, the Host IP address to connect to,
- * the ClientGUI, and the username.
- *
- *  if we have a GUI, we show message or errors on GUI. otherwise, we use BlockingQueue and share there some data so
- *  JUnit tests can watch them. we put into the BlockingQueue so JUnit can decide what happens.
- *
- * @author Liad Cohen, Timor Sharabi.
- */
 public class streamax implements Runnable {
     private static final int PORT = 1080;
     private static final Gson GSON = new GsonBuilder().create();
-    private static final String BASE_PATH = String.format("http://localhost:%d", PORT);
-    private static final String BASE_BODY = "Unicorns are real!";
-    private static final String BASE_HEADER_KEY = "X-Test-Header";
-    private static final String BASE_HEADER_VALUE = "yay";
+    private static String API_KEY = "";
+    private HttpClient client=null;
+    private String GPS_TIME="";
     private static final String HEADER_KEY = "content-type";
     private static final String HEADER_VALUE = "application/json";
-    private static final String ECHO_CONTENT = UUID.randomUUID().toString();
 
     /**
      *
@@ -82,88 +56,98 @@ public class streamax implements Runnable {
      */
     @Override
     public void run() {
-    String apiurl = String.format("http://%s:%d", host,port);
-    String apipath = String.format("/api/v1/basic/key?username=%s&password=%s", username,password);
-        handleMsg("Hello!");
+        String apiurl = String.format("http://%s:%d", host, port);
+        String apipath = String.format("/api/v1/basic/key?username=%s&password=%s", username, password);
+        //handleMsg("Hello!");
         final EntityMapper mapper = EntityMapper.newInstance()
                 .registerSerializer(JsonObject.class, GsonMapper.serializer(JsonObject.class, GSON))
                 .registerDeserializer(JsonObject.class, GsonMapper.deserializer(JsonObject.class, GSON));
 
-               HttpClient client = HttpClient.newBuilder()
+        this.client = HttpClient.newBuilder()
                 .withBaseURL(apiurl)
                 .withEntityMapper(mapper)
                 .withDecorator(request -> request.withHeader(HEADER_KEY, HEADER_VALUE))
                 .build();
 
         final HttpResponse response = client.get(apipath).execute();
-        if(response.getStatusCode() == 200)
-        {
+        if (response.getStatusCode() == 200) {
             String resBody = response.getResponseEntity(String.class);
             JsonObject jsonObject = JsonParser.parseString(resBody).getAsJsonObject();
-            JsonObject data = jsonObject.getAsJsonObject("data");
-            String key = data.get("key").getAsString();
-            handleMsg(key);
-
-            Params params = new Params();
-            params.setKey(key);
-            List<String> terIds= new ArrayList<>();
-            terIds.add("0032000F9B");
-            params.setTerid(terIds);
-            Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-            String inputPrams = gson.toJson(params);
-            handleMsg(inputPrams);
-            String apigetLast ="/api/v1/basic/gps/last";
-            final HttpResponse response2 = client.post(apigetLast).withInput(()->inputPrams).execute();
-            handleMsg(String.format("%d",response2.getStatusCode()));
-            String resBody2 = response2.getResponseEntity(String.class);
-            handleMsg(resBody2);
-
-
-
+            int errorcode = jsonObject.get("errorcode").getAsInt();
+            if (errorcode == 200) {
+                JsonObject data = jsonObject.getAsJsonObject("data");
+                API_KEY = data.get("key").getAsString();
+                //handleMsg(key);
+            }
 
         }
 
+      //we can now listen to the server, on another thread (so we don't block this thread!).
+        Runnable listeningToServer = () -> {
+            while (keepGoing) {
 
 
-
-        //mapper.getDeserializer(JsonObject.class,getKey.class);
-
-       // getKey key= gson.toJson(response.getResponseEntity(JsonObject.class));
-      //  getKey key=null;
-         //       key  = response.getResponseEntity(getKey.class);
-
-       // handleMsg(key.getData());
-       // handleMsg(mapper.getDeserializer(JsonObject.class,test.class));
-        //assertNotNull(response);
-        //assertEquals("OK", response.getStatus());
-        //assertEquals(200, response.getStatusCode());
-        //assertEquals(BASE_BODY, response.getResponseEntity(String.class));
-        //handleMsg(mapper.g);
+                ProcessData();
 
 
-//                 client.get("apipath")
-//                .onStatus(200, response -> {
-//                    handleMsg("Everything is fine");
-//                    handleMsg("Response: " + response.getResponseEntity(String.class));
-//                })
-//                .onStatus(404, response -> handleMsg("Could not find the resource =("))
-//                .onRemaining(response -> handleMsg(String.format( "Got status code: %d\n", response.getStatusCode())))
-//                .onException(Throwable::printStackTrace)
-//
-//                .execute();
+                try {
+                    Thread.sleep(10000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
 
-
-//        //we can now listen to the server, on another thread (so we don't block this thread!).
-//        Runnable listeningToServer = () -> {
-//            String line;
-//            while (keepGoing) {
-//
-//            }
-//        };
-//        Thread listenServerThread = new Thread(listeningToServer);
-//        listenServerThread.start();
+            }
+        };
+        Thread listenServerThread = new Thread(listeningToServer);
+        listenServerThread.start();
 //        //after connection made, listening to server, we can request new username for ourselves.
 //        //requestUsername(this.username);
+    }
+    void ProcessData(){
+
+        Params params = new Params();
+        params.setKey(API_KEY);
+        List<String> terIds = new ArrayList<>();
+        terIds.add("0032000F9B");
+        params.setTerid(terIds);
+        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
+        String inputPrams = gson.toJson(params);
+        //handleMsg(inputPrams);
+        String apigetLast = "/api/v1/basic/gps/last";
+        final HttpResponse response2 = client.post(apigetLast).withInput(() -> inputPrams).execute();
+        //handleMsg(String.format("%d", response2.getStatusCode()));
+        //String resBody2 = response2.getResponseEntity(String.class);
+        if ( response2.getStatusCode()==200) {
+            String resBody2 = response2.getResponseEntity(String.class);
+            JsonObject jsonObject2 = JsonParser.parseString(resBody2).getAsJsonObject();
+            int errorcode2 = jsonObject2.get("errorcode").getAsInt();
+            if(errorcode2==200) {
+                //handleMsg(resBody2);
+                JsonArray jsonData= jsonObject2.get("data").getAsJsonArray();
+
+                jsonData.forEach(item -> {
+                    JsonObject pos = item.getAsJsonObject();
+                    String gpstime= pos.get("gpstime").getAsString();
+
+                    String terId= pos.get("terid").getAsString();
+                    //String altitude = pos.get("altitude").getAsString();
+                    String direction = pos.get("direction").getAsString();
+                    String gpslat = pos.get("gpslat").getAsString();
+                    String gpslng = pos.get("gpslng").getAsString();
+                    String speed = pos.get("speed").getAsString();
+                    String mes = String.format("<< gpstime:%s,terId:%s,gpslat:%s,gpslng:%s,speed:%s"
+                            ,gpstime, terId,gpslat,gpslng,speed);
+                    if(!GPS_TIME.equals(gpstime)){
+                        handleMsg(mes);
+                    } else {
+                        handleMsg("SKIP Message!");
+                    }
+
+                    GPS_TIME=gpstime;
+
+                });
+            }
+        }
     }
 
     //a message "!2" indicates a request for all online users.
@@ -190,6 +174,7 @@ public class streamax implements Runnable {
      * it will also update the GUI "disconnect" button to "Connect".
      */
     void closeConnection() {
+        keepGoing=false;
         if(streamaxGUI !=null) /** updates GUI 'disconnect' button to 'Connect' because we are disconnected now. */
             streamaxGUI.getConnectBtn().setText("Connect");
     }
