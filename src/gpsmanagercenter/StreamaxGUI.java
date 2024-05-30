@@ -75,7 +75,41 @@ public class StreamaxGUI {
             }
 
         }); /** end actionListener for connect/disconnect button. */
+        btcmsv6.addActionListener(e -> {
+            if (btcmsv6.getText().equals("Connect")){
+                //check for valid inputs here, as well as username/port/ip etc. before try/catch.
 
+                /** lets check IP and PORT are valid. */
+                try{
+                    host = txtcmsv6IP.getText();
+                    port = Integer.parseInt(txtcmsv6Port.getText());
+                } catch (Exception e1) {
+                    addMsg("Invalid IP provided. Unknown host.");
+                    return;
+                }
+                if(port<1024 || port >65553){ //only this range is valid.
+                    addMsg("Invalid port provided. Must be an integer between 1024-65553");
+                    return;
+                }
+                String username=txtcmsv6account.getText();
+                String password= cmsv6Password.getText();
+                /** we can now try to connect on another Thread. */
+                cmsv6 = new cmsv6(host, port, this,username,password,null);
+                Thread clientThread = new Thread(cmsv6);
+                clientThread.start();
+                btcmsv6.setText("Disconnect");
+
+            }else{
+                try {
+                    cmsv6.closeConnection();
+                } catch (Exception e1) {
+                    System.out.println("Exception thrown!!!");
+                    e1.printStackTrace();
+                }
+                btcmsv6.setText("Connect");
+            }
+
+        }); /** end actionListener for connect/disconnect button. */
 
 
     }
@@ -90,7 +124,12 @@ public class StreamaxGUI {
         chatArea.setCaretPosition(chatArea.getDocument().getLength());
 
     }
+    void addMsgcmsv6(String msg) {
+        String html= msg + "\n";
+        txtcmsv6.append(html);
+        txtcmsv6.setCaretPosition(txtcmsv6.getDocument().getLength());
 
+    }
     /**
      * Main function will run as we run the application.
      * we will declare new JFrame, set its properties and then call the constructor which will initiate everything to the screen.
@@ -101,8 +140,10 @@ public class StreamaxGUI {
         frame.setContentPane(new StreamaxGUI().mainPanel); //set the pane for the frame as our JPanel from our form.
         frame.pack(); //causes the window to be sized to fit the preferred size and layouts of its sub-components.
         frame.setVisible(true); //showing the frame to the screen.
-        frame.setMinimumSize(new Dimension(830,620));
+        frame.setMinimumSize(new Dimension(1030,820));
         frame.setSize(840,640);
+        //JScrollPane scrollPane = new JScrollPane(txtcmsv6);
+
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE); //the default close for the frame, do nothing, because we will prompt a confirmation message. (in constructor).
         frame.setIconImage( new ImageIcon("./img/clientIcon.png").getImage()); // Set our icon to Client gui.
@@ -126,6 +167,9 @@ public class StreamaxGUI {
     JButton getConnectBtn(){ //will be used by Client.java to update button when connection is terminated or failed.
         return this.connectButton;
     }
+    JButton getConnectCMSV6Btn(){ //will be used by Client.java to update button when connection is terminated or failed.
+        return this.btcmsv6;
+    }
 
     /******* Private *********/
 
@@ -133,6 +177,8 @@ public class StreamaxGUI {
 
     private static JFrame frame;
     private streamax streamax;
+    private cmsv6 cmsv6;
+
     private int port;
     private String host;
     private JButton connectButton;
@@ -144,6 +190,12 @@ public class StreamaxGUI {
     private JPanel mainPanel;
     private JTextField textAccount;
     private JTextField textPassword;
+    private JTextArea txtcmsv6;
+    private JTextField txtcmsv6IP;
+    private JButton btcmsv6;
+    private JTextField txtcmsv6Port;
+    private JTextField txtcmsv6account;
+    private JPasswordField cmsv6Password;
     private JButton btAddDevice;
     private JTextField msgField;
     private JList<String>  connectedUsers;

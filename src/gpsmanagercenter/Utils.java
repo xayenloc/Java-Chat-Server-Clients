@@ -62,4 +62,23 @@ import java.util.TimeZone;
 
          return respone;
      }
+     static public List<String> getCMSV6Devies(){
+         String sqlSelectAllPersons = "SELECT uniqueid FROM oncomgpsv2.tc_devices where model='cmsv6';";
+         String connectionUrl = "jdbc:mysql://localhost:3306/oncomgpsv2?serverTimezone=UTC";
+         List<String> respone= new ArrayList<>();
+         try (Connection conn = DriverManager.getConnection(connectionUrl, "root", "a235235A@#");
+              PreparedStatement ps = conn.prepareStatement(sqlSelectAllPersons);
+              ResultSet rs = ps.executeQuery()) {
+
+             while (rs.next()) {
+                 String uniqueid = rs.getString("uniqueid");
+                 respone.add(uniqueid);
+                 // do something with the extracted data...
+             }
+         } catch (SQLException e) {
+
+         }
+
+         return respone;
+     }
 }

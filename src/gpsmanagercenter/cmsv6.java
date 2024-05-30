@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-public class streamax implements Runnable {
+public class cmsv6 implements Runnable {
     private static final int PORT = 1080;
     private static final Gson GSON = new GsonBuilder().create();
     private static String API_KEY = "";
@@ -37,7 +37,7 @@ public class streamax implements Runnable {
      * @param username String, our username we to the chat with.
      * @param queue BlockingQueue, used by JUnit for testing all functions using concurrency threads sharing data.
      */
-    public streamax(String host, int port, StreamaxGUI gui, String username, String password, BlockingQueue<String> queue) {
+    public cmsv6(String host, int port, StreamaxGUI gui, String username, String password, BlockingQueue<String> queue) {
         this.host = host;
         this.port = port;
         this.streamaxGUI = gui;
@@ -56,8 +56,9 @@ public class streamax implements Runnable {
      */
     @Override
     public void run() {
-        String apiurl = String.format("http://%s:%d", host, port);
-        String apipath = String.format("/api/v1/basic/key?username=%s&password=%s", username, password);
+        String apiurl = String.format("http://%s", host);
+        //http://114.215.25.249/StandardApiAction_login.action?account=admin&password=admin
+        String apipath = String.format("/StandardApiAction_login.action?account=%s&password=%s", username, password);
         //handleMsg("Hello!");
         final EntityMapper mapper = EntityMapper.newInstance()
                 .registerSerializer(JsonObject.class, GsonMapper.serializer(JsonObject.class, GSON))
@@ -73,17 +74,19 @@ public class streamax implements Runnable {
         if (response.getStatusCode() == 200) {
             String resBody = response.getResponseEntity(String.class);
             JsonObject jsonObject = JsonParser.parseString(resBody).getAsJsonObject();
-            int errorcode = jsonObject.get("errorcode").getAsInt();
-            if (errorcode == 200) {
-                JsonObject data = jsonObject.getAsJsonObject("data");
-                API_KEY = data.get("key").getAsString();
+
+            //handleMsg(resBody);
+            int result = jsonObject.get("result").getAsInt();
+            if (result == 0) {
+                API_KEY = jsonObject.get("jsession").getAsString();
+                //handleMsg(API_KEY);
             }
 
         } else {
             handleMsg(String.format("Error:", response.getStatusCode()));
         }
 
-      //we can now listen to the server, on another thread (so we don't block this thread!).
+        //we can now listen to the server, on another thread (so we don't block this thread!).
         Runnable listeningToServer = () -> {
             while (keepGoing) {
 
@@ -105,40 +108,47 @@ public class streamax implements Runnable {
 //        //requestUsername(this.username);
     }
     void ProcessData(){
+        //http://114.215.25.249/StandardApiAction_vehicleStatus.action?jsession=cf6b70a3-c82b-4392-8ab6-bbddce336222&vehiIdno=500000&toMap=2&currentPage=1&pageRecords=50&geoaddress=0
+        //http://114.215.25.249/StandardApiAction_getDeviceStatus.action?jsession=cf6b70a3-c82b-4392-8ab6-bbddce336222&devIdno=500000&toMap=1&language=zh
+        List<String> cmsv6Devices= Utils.getCMSV6Devies();
+        //handleMsg(cmsv6Devices.toString());
+        //String dev =cmsv6Devices.get(0);
+        List<String> devs = new ArrayList<String>();
+                    devs.add("962204488");
+                    devs.add("962204319");
+        for(var dev: devs){
+            getGPSdata(dev);
+        }
 
-        Params params = new Params();
-        params.setKey(API_KEY);
-        //List<String> terIds = new ArrayList<>();
-        //terIds.add(Utils.getDevies());
-        params.setTerid(Utils.getDevies());
-        //handleMsg(Utils.getDevies().toString());
-        Gson gson = new GsonBuilder().disableHtmlEscaping().create();
-        String inputPrams = gson.toJson(params);
-        //handleMsg(inputPrams);
-        String apigetLast = "/api/v1/basic/gps/last";
-        final HttpResponse response2 = client.post(apigetLast).withInput(() -> inputPrams).execute();
-        //handleMsg(String.format("%d", response2.getStatusCode()));
-        //String resBody2 = response2.getResponseEntity(String.class);
-        if ( response2.getStatusCode()==200) {
-            String resBody2 = response2.getResponseEntity(String.class);
-            JsonObject jsonObject2 = JsonParser.parseString(resBody2).getAsJsonObject();
-            int errorcode2 = jsonObject2.get("errorcode").getAsInt();
-            if(errorcode2==200) {
-                //handleMsg(resBody2);
-                JsonArray jsonData= jsonObject2.get("data").getAsJsonArray();
+
+    }
+void getGPSdata(String dev){
+    String apigetLast = String.format("/StandardApiAction_getDeviceStatus.action?jsession=%s&devIdno=%s&toMap=1", API_KEY,dev);
+    final HttpResponse response2 = client.post(apigetLast).execute();
+    //handleMsg(String.format("%d", response2.getStatusCode()));
+    if (response2.getStatusCode()==200) {
+        String resBody2 = response2.getResponseEntity(String.class);
+        //handleMsg(apigetLast);
+        JsonObject jsonObject2 = JsonParser.parseString(resBody2).getAsJsonObject();
+        //int errorcode2 = jsonObject2.get("errorcode").getAsInt();
+        if(response2.getStatusCode()==200) {
+            //handleMsg(resBody2);
+            int result = jsonObject2.get("result").getAsInt();
+            if (result == 0) {
+                JsonArray jsonData = jsonObject2.get("status").getAsJsonArray();
 
                 jsonData.forEach(item -> {
                     JsonObject pos = item.getAsJsonObject();
-                    String gpstime= pos.get("gpstime").getAsString();
-                    String terId= pos.get("terid").getAsString();
+                    String gpstime = pos.get("gt").getAsString();
+                    String terId = pos.get("id").getAsString();
                     //String altitude = pos.get("altitude").getAsString();
-                    String direction = pos.get("direction").getAsString();
-                    String gpslat = pos.get("gpslat").getAsString();
-                    String gpslng = pos.get("gpslng").getAsString();
-                    String speed = pos.get("speed").getAsString();
-                    String mes = String.format("StreaMax<< gpstime:%s,terId:%s,gpslat:%s,gpslng:%s,speed:%s"
-                            ,gpstime, terId,gpslat,gpslng,speed);
-                    if(!GPS_TIME.equals(gpstime)){
+                    String direction = pos.get("hx").getAsString();
+                    String gpslat = pos.get("mlat").getAsString();
+                    String gpslng = pos.get("mlng").getAsString();
+                    String speed = pos.get("sp").getAsString();
+                    String mes = String.format("CMsV6<< gpstime:%s,terId:%s,gpslat:%s,gpslng:%s,speed:%s"
+                            , gpstime, terId, gpslat, gpslng, speed);
+                    if (!GPS_TIME.equals(gpstime)) {
                         handleMsg(mes);
                         HandleMessage(
                                 terId,
@@ -152,15 +162,15 @@ public class streamax implements Runnable {
                         handleMsg("SKIP Message!");
                     }
 
-                    GPS_TIME=gpstime;
+                    GPS_TIME = gpstime;
 
                 });
             }
-        } else {
-            handleMsg(String.format("Error:",response2.getStatusCode()));
         }
+    } else {
+        handleMsg(String.format("Error:",response2.getStatusCode()));
     }
-
+}
     void HandleMessage(
             String deviceId,
             long timestamp,
@@ -202,57 +212,12 @@ public class streamax implements Runnable {
     void closeConnection() {
         keepGoing=false;
         if(streamaxGUI !=null) /** updates GUI 'disconnect' button to 'Connect' because we are disconnected now. */
-            streamaxGUI.getConnectBtn().setText("Connect");
+            streamaxGUI.getConnectCMSV6Btn().setText("Connect");
     }
 
     private void handleMsg(String line) {
-        if (line.startsWith("!2")) { //all online users
-            line = line.substring(2);
-            String[] onlines = line.split(",");
-            DefaultListModel model = new DefaultListModel();
-            model.addAll(Arrays.asList(onlines));
-            if (streamaxGUI !=null) {
-                streamaxGUI.setListModel(model);
-            } else {
-                try {
-                    queue.put(line);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        } else if (line.startsWith("!3")) {//server telling us he is shutting down.
-            closeConnection();
-            keepGoing = false;
-            if (streamaxGUI !=null) {
-                streamaxGUI.addMsg("Server is shutting down, you are disconnected.");
-            } else {
-                try {
-                    queue.put("Server is shutting down, you are disconnected.");
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }else if(line.startsWith("!9")){ //server telling us to pick different username.
-            closeConnection();
-            if (streamaxGUI !=null) {
-                streamaxGUI.addMsg(line.substring(2));
-            } else {
-                try {
-                    queue.put(line.substring(2));
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }else{ //server sending us regular message from broadcast.
-            if (streamaxGUI !=null) {
-                streamaxGUI.addMsg(line);
-            } else {
-                try {
-                    queue.put(line);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+        if (streamaxGUI !=null) {
+            streamaxGUI.addMsgcmsv6(line);
         }
     }
 
@@ -275,29 +240,29 @@ public class streamax implements Runnable {
     private PrintWriter writer;
     private BlockingQueue<String> queue;
 }
-class Params{
+class cmsv6Params{
     private  String key;
     private  List<String> terid;
 
-        public String getKey() {
-            return key;
-        }
-
-        public void setKey(String key) {
-            this.key = key;
-        }
-
-        public void setTerid(List<String> terid) {
-            this.terid = terid;
-        }
-
-        public List<String> getTerid() {
-            return terid;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s%s", key,terid);
-
-        }
+    public String getKey() {
+        return key;
     }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setTerid(List<String> terid) {
+        this.terid = terid;
+    }
+
+    public List<String> getTerid() {
+        return terid;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s%s", key,terid);
+
+    }
+}
