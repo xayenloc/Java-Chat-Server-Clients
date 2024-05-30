@@ -57,7 +57,6 @@ import java.util.TimeZone;
                  // do something with the extracted data...
              }
          } catch (SQLException e) {
-             // handle the exception
 
          }
 

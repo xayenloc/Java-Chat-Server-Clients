@@ -77,9 +77,10 @@ public class streamax implements Runnable {
             if (errorcode == 200) {
                 JsonObject data = jsonObject.getAsJsonObject("data");
                 API_KEY = data.get("key").getAsString();
-                //handleMsg(key);
             }
 
+        } else {
+            handleMsg(String.format("Error:", response.getStatusCode()));
         }
 
       //we can now listen to the server, on another thread (so we don't block this thread!).
@@ -155,6 +156,8 @@ public class streamax implements Runnable {
 
                 });
             }
+        } else {
+            handleMsg(String.format("Error:",response2.getStatusCode()));
         }
     }
 
