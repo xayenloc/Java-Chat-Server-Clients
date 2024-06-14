@@ -47,7 +47,7 @@ import java.util.TimeZone;
          String sqlSelectAllPersons = "SELECT uniqueid FROM oncomgpsv2.tc_devices where model='streamax';";
          String connectionUrl = "jdbc:mysql://localhost:3306/oncomgpsv2?serverTimezone=UTC";
          List<String> respone= new ArrayList<>();
-         try (Connection conn = DriverManager.getConnection(connectionUrl, "root", "a235235A@#");
+         try (Connection conn = DriverManager.getConnection(connectionUrl, "root", "a235235A@#%&");
               PreparedStatement ps = conn.prepareStatement(sqlSelectAllPersons);
               ResultSet rs = ps.executeQuery()) {
 
@@ -66,7 +66,7 @@ import java.util.TimeZone;
          String sqlSelectAllPersons = "SELECT uniqueid FROM oncomgpsv2.tc_devices where model='cmsv6';";
          String connectionUrl = "jdbc:mysql://localhost:3306/oncomgpsv2?serverTimezone=UTC";
          List<String> respone= new ArrayList<>();
-         try (Connection conn = DriverManager.getConnection(connectionUrl, "root", "a235235A@#");
+         try (Connection conn = DriverManager.getConnection(connectionUrl, "root", "a235235A@#%&");
               PreparedStatement ps = conn.prepareStatement(sqlSelectAllPersons);
               ResultSet rs = ps.executeQuery()) {
 

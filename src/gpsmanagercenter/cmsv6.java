@@ -113,10 +113,10 @@ public class cmsv6 implements Runnable {
         List<String> cmsv6Devices= Utils.getCMSV6Devies();
         //handleMsg(cmsv6Devices.toString());
         //String dev =cmsv6Devices.get(0);
-        List<String> devs = new ArrayList<String>();
-                    devs.add("962204488");
-                    devs.add("962204319");
-        for(var dev: devs){
+//        List<String> devs = new ArrayList<String>();
+//                    devs.add("962204488");
+//                    devs.add("962204319");
+        for(var dev: cmsv6Devices){
             getGPSdata(dev);
         }
 

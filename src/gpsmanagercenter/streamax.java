@@ -8,6 +8,7 @@ import http4j.HttpResponse;
 import http4j.external.GsonMapper;
 
 import javax.swing.*;
+import java.awt.event.AdjustmentEvent;
 import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -58,7 +59,7 @@ public class streamax implements Runnable {
     public void run() {
         String apiurl = String.format("http://%s:%d", host, port);
         String apipath = String.format("/api/v1/basic/key?username=%s&password=%s", username, password);
-        //handleMsg("Hello!");
+        handleMsg(apipath);
         final EntityMapper mapper = EntityMapper.newInstance()
                 .registerSerializer(JsonObject.class, GsonMapper.serializer(JsonObject.class, GSON))
                 .registerDeserializer(JsonObject.class, GsonMapper.deserializer(JsonObject.class, GSON));
@@ -92,7 +93,7 @@ public class streamax implements Runnable {
 
 
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(20000);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
@@ -112,6 +113,12 @@ public class streamax implements Runnable {
         //terIds.add(Utils.getDevies());
         params.setTerid(Utils.getDevies());
         //handleMsg(Utils.getDevies().toString());
+        for(var dev: Utils.getDevies())
+        {
+            handleMsg(dev);
+        }
+        handleMsg(API_KEY);
+
         Gson gson = new GsonBuilder().disableHtmlEscaping().create();
         String inputPrams = gson.toJson(params);
         //handleMsg(inputPrams);
